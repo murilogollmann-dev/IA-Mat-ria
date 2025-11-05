@@ -7,7 +7,7 @@ st.set_page_config(page_title="IA Matéria", page_icon="🤖", layout="centered"
 st.title("Descubra seu Material!")
 
 # 📂 Carrega o Excel numérico
-df = pd.read_excel(r"C:\\Users\\murilo.gollmann\\Desktop\\materiais_numerico.xlsx")
+df = pd.read_excel("materiais_numerico.xlsx")
 
 # === Inicializa session_state ===
 if "chats" not in st.session_state:
@@ -118,3 +118,4 @@ if prompt := st.chat_input("Descreva o material:"):
     chat_atual.append({"role": "assistant", "content": resposta})
     with st.chat_message("assistant"):
         st.markdown(resposta)
+
