@@ -76,6 +76,10 @@ Exemplo:
 `tipo=2, peso=1, resistencia=3, condutividade=4, reciclavel=1, biodegradavel=0, toxicidade=1, temperatura_max=200`
 """)
 
+# Mostra colunas disponíveis para ajudar o usuário
+st.write("📊 **Propriedades disponíveis:**")
+st.write(", ".join(df.columns))
+
 # Entrada do usuário
 if prompt := st.chat_input("Descreva o material:"):
     chat_atual.append({"role": "user", "content": prompt})
@@ -94,25 +98,29 @@ if prompt := st.chat_input("Descreva o material:"):
         entrada_df = entrada_df.reindex(columns=df.columns, fill_value=0)
         entrada_df = entrada_df.drop(columns=["nome_material"], errors="ignore")
 
-        # Garante que o DataFrame base está preparado
-        df_num = df.drop(columns=["nome_material"], errors="ignore")
+        # Garante que o DataFrame base está preparado (somente colunas numéricas)
+        df_num = df.select_dtypes(include=[np.number])
 
         # Calcula distância euclidiana
         distancias = np.sqrt(((df_num - entrada_df.iloc[0]) ** 2).sum(axis=1))
-        similaridades = 1 / (1 + distancias)
+
+        # Normaliza similaridade (0 a 100%)
+        similaridades = 1 - (distancias / distancias.max())
+        similaridades = (similaridades * 100).clip(lower=0)
 
         # Junta com o nome dos materiais
         resultados = pd.DataFrame({
             "Material": df["nome_material"],
-            "Similaridade (%)": (similaridades * 100).round(2)
+            "Similaridade (%)": similaridades.round(2)
         }).sort_values(by="Similaridade (%)", ascending=False).head(3)
 
-        resposta = "🔎 Materiais mais compatíveis:\n\n"
+        # Cria resposta formatada
+        resposta = "🔎 **Materiais mais compatíveis:**\n\n"
         for i, row in resultados.iterrows():
             resposta += f"**{row['Material']}** — Similaridade: {row['Similaridade (%)']}%\n"
 
     except Exception as e:
-        resposta = f"⚠️ Não consegui interpretar sua entrada.\nErro técnico: {e}"
+        resposta = f"⚠️ Não consegui interpretar sua entrada.\n\n**Erro técnico:** {e}"
 
     # Mostra resposta
     chat_atual.append({"role": "assistant", "content": resposta})
