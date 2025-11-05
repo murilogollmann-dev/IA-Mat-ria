@@ -51,13 +51,7 @@ with st.sidebar:
                 st.rerun()
 
     st.markdown("---")
-    st.subheader("
-    
-                 
-                 
-                 
-                 
-    👨‍💻 Desenvolvido por:")
+    st.subheader("👨‍💻 Desenvolvido por:")
     st.markdown("""
     - *Cauã*
     - *Lázaro*
@@ -132,5 +126,6 @@ if prompt := st.chat_input("Descreva o material:"):
     chat_atual.append({"role": "assistant", "content": resposta})
     with st.chat_message("assistant"):
         st.markdown(resposta)
+
 
 
